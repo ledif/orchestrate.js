@@ -35,6 +35,12 @@ var users = {
   }
 }
 
+var subDocs = {
+  steve: {
+    "name": "Stephen Kaliski"
+  }
+}
+
 var refsList = {
   "count": 3,
   "results": [
@@ -94,6 +100,8 @@ var fakeOrchestrate = nock('https://api.orchestrate.io/')
   .put('/v0/users/byrd%40bowery.io')
   .reply(201)
   .put('/v0/users/byrd%40bowery.io')
+  .reply(201)
+  .patch('/v0/users/sjkaliski%40gmail.com')
   .reply(201)
   .delete('/v0/users/byrd%40bowery.io')
   .reply(204)
@@ -159,6 +167,14 @@ suite('Key-Value', function () {
 
   test('Store value at key with conditional', function (done) {
     db.put('users', 'byrd@bowery.io', users.david, false)
+    .then(function (res) {
+      assert.equal(201, res.statusCode)
+      done()
+    })
+  })
+
+  test('Update sub doc at key', function (done) {
+    db.patch('users', 'sjkaliski@gmail.com', subDocs.steve)
     .then(function (res) {
       assert.equal(201, res.statusCode)
       done()
