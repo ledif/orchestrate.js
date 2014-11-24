@@ -67,6 +67,20 @@ db.put('collection', 'key', {
 })
 ```
 
+To update a sub document:
+
+```javascript
+db.patch('collection', 'key', {
+  "name": "Stephen Kaliski"
+})
+.then(function (result) {
+  
+})
+.fail(function (err) {
+  
+})
+```
+
 Or, setting a value and allowing the server to generate a key:
 
 ```javascript
