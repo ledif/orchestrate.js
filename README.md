@@ -119,6 +119,12 @@ db.remove('collection', 'key', true)
 
 The last parameter is optional. If supplied the ref history will be removed as well.
 
+You can also execute a conditional delete by supplying a fourth argument, the ref value:
+
+```javascript
+db.remove('collection', 'key', true, 'ref')
+```
+
 ## Refs
 
 To get a value at a specific ref:
