@@ -12,19 +12,19 @@ var users = require('./testdata');
 var util = require('util');
 
 suite('Key-Value', function () {
-  before(function(done) {
+  suiteSetup(function(done) {
     users.reset(done);
   });
 
   test('Put/Get roundtrip', function (done) {
-    db.put('users', users.steve_v0.email, users.steve_v0)
+    db.put('users', users.steve.email, users.steve)
       .then(function (res) {
         assert.equal(201, res.statusCode);
-        return db.get('users', users.steve_v0.email);
+        return db.get('users', users.steve.email);
       })
       .then(function (res) {
         assert.equal(200, res.statusCode);
-        assert.deepEqual(users.steve_v0, res.body);
+        assert.deepEqual(users.steve, res.body);
         done();
       })
       .fail(function (e) {
@@ -33,10 +33,10 @@ suite('Key-Value', function () {
   });
 
   test('Get by ref', function(done) {
-    db.get('users', users.steve_v0.email, '0eb6642ca3efde45')
+    db.get('users', users.steve.email, '0eb6642ca3efde45')
       .then(function (res) {
         assert.equal(200, res.statusCode);
-        assert.deepEqual(users.steve_v0, res.body);
+        assert.deepEqual(users.steve, res.body);
         done();
       })
       .fail(function (e) {
@@ -45,10 +45,10 @@ suite('Key-Value', function () {
   });
 
   test('List refs for a key', function(done) {
-    db.put('users', users.steve_v0.email, users.steve_v1)
+    db.put('users', users.steve.email, users.steve_v1)
       .then(function (res) {
         assert.equal(201, res.statusCode);
-        return db.list_refs('users', users.steve_v0.email);
+        return db.list_refs('users', users.steve.email);
       })
       .then(function (res) {
         assert.equal(200, res.statusCode);
@@ -76,7 +76,7 @@ suite('Key-Value', function () {
         assert.equal(1, res.body.count);
         assert.deepEqual(users.steve_v1, res.body.results[0].value);
         assert.equal(undefined, res.body.next);
-        return db.list('users', {limit:1, beforeKey:users.steve_v1.email});
+        return db.list('users', {limit:1, beforeKey:users.steve.email});
       })
       .then(function (res) {
         assert.equal(200, res.statusCode);
@@ -94,10 +94,10 @@ suite('Key-Value', function () {
   });
 
   test('Subdocument merge', function(done) {
-    db.merge('users', users.steve_v1.email, {type: "consultant"})
+    db.merge('users', users.steve.email, {type: "consultant"})
       .then(function (res) {
         assert.equal(201, res.statusCode);
-        return db.get('users', users.steve_v1.email);
+        return db.get('users', users.steve.email);
       })
       .then(function (res) {
         assert.equal(200, res.statusCode);
@@ -110,7 +110,7 @@ suite('Key-Value', function () {
   });
 
   test('Subdocument patch', function(done) {
-    db.newPatchBuilder('users', users.steve_v1.email)
+    db.newPatchBuilder('users', users.steve.email)
       .add("type", "salaried")
       .copy("type", "paytype")
       .test("paytype", "salaried")
@@ -118,7 +118,7 @@ suite('Key-Value', function () {
       .apply()
       .then(function (res) {
         assert.equal(201, res.statusCode);
-        return db.get('users', users.steve_v1.email);
+        return db.get('users', users.steve.email);
       })
       .then(function (res) {
         assert.equal(200, res.statusCode);

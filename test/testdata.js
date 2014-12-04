@@ -11,7 +11,7 @@ var util = require('util');
 
 // Test data.
 function Users() {
-  this.steve_v0 = {
+  this.steve = {
     "name": "Steve Kaliski",
     "email": "sjkaliski@gmail.com",
     "location": "New York",
@@ -68,7 +68,7 @@ function Users() {
 Users.prototype.reset = function(done) {
   var dels = [];
   var obj = this;
-  dels.push(db.remove('users', obj.steve_v0.email, true));
+  dels.push(db.remove('users', obj.steve.email, true));
   dels.push(db.remove('users', obj.david.email, true));
   dels.push(db.remove('users', obj.kelsey.email, true));
   Q.all(dels)
@@ -82,6 +82,23 @@ Users.prototype.reset = function(done) {
     })
     .then(function (res) {
       assert.equal(201, res.statusCode);
+      done();
+    })
+    .fail(function (res) {
+      done(res);
+    });
+};
+
+Users.prototype.insertAll = function(done) {
+  var inserts = [];
+  inserts.push(db.put('users', this.steve.email, this.steve));
+  inserts.push(db.put('users', this.kelsey.email, this.kelsey));
+  Q.all(inserts)
+    .then(function (res) {
+      assert.equal(2, res.length);
+      for (var i in res) {
+        assert.equal(201, res[i].statusCode);
+      }
       done();
     })
     .fail(function (res) {
