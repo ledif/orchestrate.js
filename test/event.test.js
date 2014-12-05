@@ -22,6 +22,7 @@ suite('Events', function () {
         .from('users', users.steve.email)
         .type('update')
         .time(tstamp)
+        .ordinal(0)
         .data({"text": data})
         .create(); };
 
@@ -43,7 +44,7 @@ suite('Events', function () {
         return db.newEventReader()
           .from('users', users.steve.email)
           .type('update')
-          .list()
+          .list();
       })
       .then(function (res) {
         assert.equal(200, res.statusCode);
