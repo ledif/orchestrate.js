@@ -67,10 +67,10 @@ db.put('collection', 'key', {
 })
 ```
 
-To update a sub document:
+To merge (or update) new values into an existing key, construct a partial document with the desired changes and then use `merge`:
 
 ```javascript
-db.patch('collection', 'key', {
+db.merge('collection', 'key', {
   "name": "Stephen Kaliski"
 })
 .then(function (result) {
@@ -79,6 +79,20 @@ db.patch('collection', 'key', {
 .fail(function (err) {
   
 })
+```
+
+Alternatively, you can apply a series of controlled changes to a key by constructing a patch:
+
+```javascript
+db.newPatchBuilder('collection', 'key')
+  .add('age', 25)
+  .replace('hometown': 'NY')
+  .apply()
+  .then(function (result) {
+      // Either all the changes were applied or they were not
+  })
+  .fail(function (err) {
+  })
 ```
 
 Or, setting a value and allowing the server to generate a key:
