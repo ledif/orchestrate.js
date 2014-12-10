@@ -97,5 +97,27 @@ suite('Search', function () {
       });
   });
 
-  // Geo-search
+  // TODO: Geo-search
+
+  // Aggregates
+  test('Aggregates support', function (done) {
+    db.newSearchBuilder()
+    .collection('users')
+    .aggregate('range', 'age', '*~5:5~10:10~30:30~*')
+    .query('*')
+    .then(function (res) {
+      assert.equal(200, res.statusCode)
+      done()
+    })
+    .fail(done)
+  })
+
+  // Simple Search
+  test('Calling search() directly on the client w/o options', function (done) {
+    db.search('users', 'denver').then(function (res) {
+      assert.equal(200, res.statusCode);
+      assert.equal(res.body.count, 0);
+      done()
+    })
+  })
 });
