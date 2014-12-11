@@ -23,18 +23,6 @@ suite('Misc', function () {
     });
   });
 
-  // Collection deletion
-  test('Collection deletion', function(done) {
-    db.deleteCollection('users')
-      .then(function(res) {
-        assert.equal(204, res.statusCode);
-        done();
-      })
-      .fail(function(res) {
-        done(res);
-      });
-  });
-
   // Service ping
   test('Service ping', function(done) {
     db.ping()
