@@ -45,7 +45,7 @@
     "nock": "^0.45.0"
   },
   "scripts": {
-    "test": "npm run cov && ./node_modules/.bin/mocha -u tdd",
+    "test": "npm run cov && ./node_modules/.bin/mocha -u tdd -t 5000",
     "cov": "./node_modules/.bin/jscoverage lib lib-cov",
     "report": "npm run cov && ./node_modules/.bin/mocha -u tdd -R html-cov > coverage.html",
     "coveralls": "npm run cov && ./node_modules/.bin/mocha -u tdd -R mocha-lcov-reporter | ./node_modules/coveralls/bin/coveralls.js"
