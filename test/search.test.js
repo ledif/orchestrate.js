@@ -103,7 +103,11 @@ suite('Search', function () {
   test('Aggregates support', function (done) {
     db.newSearchBuilder()
     .collection('users')
-    .aggregate('range', 'age', '*~5:5~10:10~30:30~*')
+    .aggregate('age', db.newRangeBuilder()
+	.below(10)
+	.between(10, 20)
+	.above(20)
+    )
     .query('*')
     .then(function (res) {
       assert.equal(200, res.statusCode)
