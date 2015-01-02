@@ -31,6 +31,16 @@ $ npm test
 var db = require('orchestrate')(token)
 ```
 
+Note, the client defaults to the Amazon US East Datacenter. If you've created your Application in a different datacenter, you'll need to configure the client with that Datacenter's Api URL. For example, for Amazon EU West:
+
+```javascript
+var oio = require('orchestrate')
+oio.ApiEndPoint = "api.aws-eu-west-1.orchestrate.io"
+var db = oio(token)
+```
+
+Please see the Orchestrate [MDC Docs](https://orchestrate.io/docs/multi-data-center) for more information on Multi-Datacenter.
+
 # Running Queries
 
 Orchestrate comes with support for GET/PUT/DEL for key-value queries, as well as search, graph, and events. Documentation can be found [here](https://orchestrate.io/docs/api/).
