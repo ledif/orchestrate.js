@@ -39,7 +39,7 @@ oio.ApiEndPoint = "api.aws-eu-west-1.orchestrate.io"
 var db = oio(token)
 ```
 
-Please see the Orchestrate [MDC Docs](https://orchestrate.io/docs/multi-data-center for more information).
+Please see the Orchestrate [MDC Docs](https://orchestrate.io/docs/multi-data-center) for more information on Multi-Datacenter.
 
 # Running Queries
 
