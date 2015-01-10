@@ -115,6 +115,9 @@ suite('Key-Value', function () {
       .copy("type", "paytype")
       .test("paytype", "salaried")
       .remove("paytype")
+      .add('hats', 0)
+      .inc('hats', 7)
+      .inc('hats', -2)
       .apply()
       .then(function (res) {
         assert.equal(201, res.statusCode);
@@ -122,7 +125,7 @@ suite('Key-Value', function () {
       })
       .then(function (res) {
         assert.equal(200, res.statusCode);
-        assert.deepEqual(users.steve_v3, res.body);
+        assert.deepEqual(users.steve_v4, res.body);
         done();
       })
       .fail(function (e) {
@@ -164,7 +167,7 @@ suite('Key-Value', function () {
     db.get('users', users.steve.email)
       .then(function (res) {
         assert.equal(200, res.statusCode);
-        assert.deepEqual(users.steve_v3, res.body);
+        assert.deepEqual(users.steve_v4, res.body);
         return db.newPatchBuilder('users', users.steve.email)
           .add("type", "consultant")
           .apply("00242d00737faf60");

@@ -39,6 +39,14 @@ function Users() {
     "type": "salaried"
   };
 
+  this.steve_v4 = {
+    "name": "Steve Kaliski",
+    "email": "sjkaliski@gmail.com",
+    "location": "New York, NY",
+    "type": "salaried",
+    "hats": 5
+  };
+
   this.david = {
     "name": "David Byrd",
     "email": "byrd@bowery.io",
