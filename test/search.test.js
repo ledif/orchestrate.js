@@ -120,7 +120,7 @@ suite('Search', function () {
       .after(2);
     })
     .time_series('path', 'day')
-    .query('*')
+    .query('value.location:NEAR:{latitude:12.3 longitude:56.7 radius:100km}')
     .then(function (res) {
       assert.equal(200, res.statusCode);
       done();
