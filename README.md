@@ -256,8 +256,10 @@ db.newSearchBuilder()
 .sort('age', 'asc')
 .aggregate('stats', 'value.name')
 .stats('username')
+// these two range aggregates are identical
+// but they use different interfaces
 .range('coolness', '*~1:1~2:2~*')
-.range('babeness', function (builder) {
+.range('radness', function (builder) {
   return builder
   .before(1)
   .between(1, 2)
