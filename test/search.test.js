@@ -97,7 +97,7 @@ suite('Search', function () {
       });
   });
 
-  // Geo-search
+  // TODO Geo-search
 
   // Aggregates
   test('Search aggregates', function (done) {
@@ -106,7 +106,7 @@ suite('Search', function () {
     .aggregate('stats', 'value.name')
     .stats('value.username')
     .range('value.coolness', '*~1:1~2:2~*')
-    .range('value.babeness', function (builder) {
+    .range('value.radness', function (builder) {
       return builder
       .before(1)
       .between(1, 2)
