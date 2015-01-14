@@ -97,5 +97,34 @@ suite('Search', function () {
       });
   });
 
-  // Geo-search
+  // TODO Geo-search
+
+  // Aggregates
+  test('Search aggregates', function (done) {
+    db.newSearchBuilder()
+    .collection('users')
+    .aggregate('stats', 'value.name')
+    .stats('value.username')
+    .range('value.coolness', '*~1:1~2:2~*')
+    .range('value.radness', function (builder) {
+      return builder
+      .before(1)
+      .between(1, 2)
+      .after(2);
+    })
+    .distance('value.location', '*~1:1~2:2~*')
+    .distance('value.hometown', function (builder) {
+      return builder
+      .before(1)
+      .between(1, 2)
+      .after(2);
+    })
+    .time_series('path', 'day')
+    .query('value.location:NEAR:{latitude:12.3 longitude:56.7 radius:100km}')
+    .then(function (res) {
+      assert.equal(200, res.statusCode);
+      done();
+    })
+    .fail(done);
+  });
 });
