@@ -254,6 +254,25 @@ db.newSearchBuilder()
 .offset(10)
 .sort('name', 'desc')
 .sort('age', 'asc')
+.aggregate('stats', 'value.name')
+.stats('username')
+.range('coolness', '*~1:1~2:2~*')
+.range('babeness', function (builder) {
+  return builder
+  .before(1)
+  .between(1, 2)
+  .after(2);
+})
+// these two distance aggregates are identical
+// but they use different interfaces
+.distance('location', '*~1:1~2:2~*')
+.distance('hometown', function (builder) {
+  return builder
+  .before(1)
+  .between(1, 2)
+  .after(2);
+})
+.time_series('path', 'day')
 .query('steve')
 ```
 
