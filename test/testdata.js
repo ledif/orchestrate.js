@@ -10,7 +10,8 @@ var db = require('../lib-cov/client')(token);
 var util = require('util');
 
 // Test data.
-function Users() {
+function Users(collection) {
+  this.collection = collection;
   this.steve = {
     "name": "Steve Kaliski",
     "email": "sjkaliski@gmail.com",
@@ -64,47 +65,106 @@ function Users() {
   };
 }
 
+var USER_EVENTS = {
+  "steve" : {
+    "key": "sjkaliski@gmail.com",
+    "events" : {
+      "activities" : [
+        {
+          "activity": "followed",
+          "user": "sjkaliski@gmail.com",
+          "userName": "Steve Kaliski"
+        }
+      ]
+    }
+  }
+}
+
+function delete_all(dels) {
+  return Q.all(dels)
+    .then(function (res) {
+      assert.equal(dels.length, res.length);
+      for (var i in res) {
+        assert.equal(204, res[i].statusCode);
+      }
+    })
+    .fail(function(res) {
+      assert.equal(404, res.statusCode);
+    })
+}
 
 Users.prototype.reset = function(done) {
   var dels = [];
   var obj = this;
-  dels.push(db.remove('users', obj.steve.email, true));
-  dels.push(db.remove('users', obj.david.email, true));
-  dels.push(db.remove('users', obj.kelsey.email, true));
-  Q.all(dels)
-    .then(function (res) {
-      assert.equal(3, res.length);
-      for(var i in res) {
-        assert.equal(204, res[i].statusCode);
+  var collection = this.collection;
+  db.search(collection, '@path.kind:event', {limit:100})
+    .then(function(res) {
+      var results = res.body.results
+      for(var i=0;i<results.length;i++) {
+        var path = results[i].path
+        dels.push(db.newEventBuilder()
+          .from(path.collection, path.key)
+          .type(path.type)
+          .time(path.timestamp)
+          .ordinal(path.ordinal_str)
+          .remove())
       }
-
-      return db.put('users', obj.david.email, obj.david);
+      return delete_all(dels)
+    })
+    .then(function(res){
+      dels = []
+      dels.push(db.remove(collection, obj.steve.email, true))
+      dels.push(db.remove(collection, obj.david.email, true))
+      dels.push(db.remove(collection, obj.kelsey.email, true))
+      return delete_all(dels)
+    })
+    .then(function(res) {
+      return db.put(collection, obj.david.email, obj.david);
     })
     .then(function (res) {
       assert.equal(201, res.statusCode);
       done();
     })
-    .fail(function (res) {
-      done(res);
-    });
+    .fail(function(res){
+      done(res)
+    })
 };
 
 Users.prototype.insertAll = function(done) {
   var inserts = [];
-  inserts.push(db.put('users', this.steve.email, this.steve));
-  inserts.push(db.put('users', this.kelsey.email, this.kelsey));
+  var collection = this.collection;
+
+  inserts.push(db.put(collection, this.steve.email, this.steve));
+  inserts.push(db.put(collection, this.kelsey.email, this.kelsey));
+  for (var user_id in USER_EVENTS) {
+    var user = USER_EVENTS[user_id]
+    var user_key = user.key
+    for (var event_name in user.events) {
+      var event_list = user.events[event_name]
+      for (var i=0; i<event_list.length; i++) {
+        inserts.push(db.newEventBuilder()
+            .from(collection, user_key)
+            .type(event_name)
+            .data(event_list[i])
+            .create()
+        )
+      }
+    }
+  }
   Q.all(inserts)
     .then(function (res) {
-      assert.equal(2, res.length);
+      assert.equal(inserts.length, res.length);
       for (var i in res) {
         assert.equal(201, res[i].statusCode);
       }
-      done();
+      // Give search a chance to index all changes
+      setTimeout(done, 1500);
     })
     .fail(function (res) {
       done(res);
     });
 };
 
-module.exports = new Users();
-
+module.exports = function(testName) {
+  return new Users(testName + "_users_" + process.version);
+}
