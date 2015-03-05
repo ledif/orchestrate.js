@@ -7,19 +7,15 @@
 var assert = require('assert');
 var token = require('./creds').token;
 var db = require('../lib-cov/client')(token);
-var users = require('./testdata');
+var users = require('./testdata')('search.test');
 var Q = require('kew');
 var util = require('util');
-
 
 suite('Search', function () {
   suiteSetup(function (done) {
     users.reset(function(res) {
       if (!res) {
-        users.insertAll(function() {
-          // Give search a chance to index all changes
-          setTimeout(done, 1500);
-        });
+        users.insertAll(done);
       } else {
         done(res);
       }
@@ -29,7 +25,7 @@ suite('Search', function () {
     // Basic search
   test('Basic search', function (done) {
     db.newSearchBuilder()
-      .collection('users')
+      .collection(users.collection)
       .query('location: New*')
       .then(function (res) {
         assert.equal(200, res.statusCode);
@@ -44,7 +40,7 @@ suite('Search', function () {
   // Search with offset
   test('Search with offset', function (done) {
     db.newSearchBuilder()
-      .collection('users')
+      .collection(users.collection)
       .offset(2)
       .query('*')
       .then(function (res) {
@@ -62,7 +58,7 @@ suite('Search', function () {
   // Search with offset and limit
   test('Search with offset & limit', function (done) {
     db.newSearchBuilder()
-      .collection('users')
+      .collection(users.collection)
       .offset(1)
       .limit(1)
       .query('*')
@@ -71,7 +67,7 @@ suite('Search', function () {
         // XXX: API inconsistency?
         //        assert.equal(2, res.body.total_count);
         assert.equal(1, res.body.count);
-        assert.equal(res.body.next, '/v0/users?limit=1&query=*&offset=2');
+        assert.equal(res.body.next, '/v0/'+users.collection+'?limit=1&query=*&offset=2');
         done();
       })
       .fail(function (res) {
@@ -82,7 +78,7 @@ suite('Search', function () {
   // Search and sort
   test('Search and sort', function (done) {
     db.newSearchBuilder()
-      .collection('users')
+      .collection(users.collection)
       .sort('name', 'desc')     // Reverse-alpha
       .query('New York')
       .then(function (res) {
@@ -102,7 +98,7 @@ suite('Search', function () {
   // Aggregates
   test('Search aggregates', function (done) {
     db.newSearchBuilder()
-    .collection('users')
+    .collection(users.collection)
     .aggregate('stats', 'value.name')
     .stats('value.username')
     .range('value.coolness', '*~1:1~2:2~*')
@@ -128,4 +124,24 @@ suite('Search', function () {
     })
     .fail(done);
   });
+
+  // Search Events
+  test('Search events', function (done) {
+    db.newSearchBuilder()
+      .collection(users.collection)
+      .kinds('event')
+      .query('@path.type:activities AND steve')
+      .then(function (res) {
+        assert.equal(200, res.statusCode);
+        assert.equal(1, res.body.total_count);
+        assert.equal(users.steve.email, res.body.results[0].path.key);
+        assert.equal('event', res.body.results[0].path.kind);
+        assert.equal('activities', res.body.results[0].path.type);
+        done();
+      })
+      .fail(function (res) {
+        done(res);
+      });
+  });
+
 });

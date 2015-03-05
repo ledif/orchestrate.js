@@ -7,7 +7,7 @@
 var assert = require('assert');
 var token = require('./creds').token;
 var db = require('../lib-cov/client')(token);
-var users = require('./testdata');
+var users = require('./testdata')('graph.test');
 var Q = require('kew');
 var util = require('util');
 
@@ -18,7 +18,6 @@ var r = function(collection, from, to, kind) {
     .related(kind)
     .to(collection, to);
 };
-
 
 suite('Graph', function () {
   suiteSetup(function (done) {
@@ -32,8 +31,8 @@ suite('Graph', function () {
   });
 
   test('Create graph relationships', function(done) {
-     var relations = [r('users', users.steve.email, users.kelsey.email, "friend"),
-                      r('users', users.kelsey.email, users.david.email, "friend")];
+     var relations = [r(users.collection, users.steve.email, users.kelsey.email, "friend"),
+                      r(users.collection, users.kelsey.email, users.david.email, "friend")];
 
     Q.all(relations)
       .then(function (res) {
@@ -51,7 +50,7 @@ suite('Graph', function () {
   test('Traverse graph relationship', function(done) {
     db.newGraphReader()
       .get()
-      .from('users', users.steve.email)
+      .from(users.collection, users.steve.email)
       .related('friend', 'friend')
       .then(function (res) {
         assert.equal(200, res.statusCode);
@@ -66,14 +65,14 @@ suite('Graph', function () {
   test('Delete graph relationship', function(done) {
     db.newGraphBuilder()
       .remove()
-      .from('users', users.kelsey.email)
+      .from(users.collection, users.kelsey.email)
       .related('friend')
-      .to('users', users.david.email)
+      .to(users.collection, users.david.email)
       .then(function (res) {
         assert.equal(res.statusCode, 204);
         return db.newGraphReader()
           .get()
-          .from('users', users.steve.email)
+          .from(users.collection, users.steve.email)
           .related('friend', 'friend');
       })
       .then(function (res) {
