@@ -5,8 +5,7 @@
 
 var assert = require('assert');
 var Q = require('kew');
-var token = require('./creds').token;
-var db = require('../lib-cov/client')(token);
+var db = require('./creds')();
 var util = require('util');
 
 // Test data.
@@ -114,6 +113,7 @@ Users.prototype.reset = function(done) {
     .then(function(res){
       dels = []
       dels.push(db.remove(collection, obj.steve.email, true))
+      dels.push(db.remove(collection, obj.steve.email+'_2', true))
       dels.push(db.remove(collection, obj.david.email, true))
       dels.push(db.remove(collection, obj.kelsey.email, true))
       return delete_all(dels)
