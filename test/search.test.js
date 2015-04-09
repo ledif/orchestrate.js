@@ -100,6 +100,8 @@ suite('Search', function () {
     db.newSearchBuilder()
     .collection(users.collection)
     .aggregate('stats', 'value.name')
+    .top_values('value.tags')
+    .top_values('value.categories', 20, 10)
     .stats('value.username')
     .range('value.coolness', '*~1:1~2:2~*')
     .range('value.radness', function (builder) {
