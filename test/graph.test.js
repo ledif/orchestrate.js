@@ -5,8 +5,7 @@
 
 // Module Dependencies.
 var assert = require('assert');
-var token = require('./creds').token;
-var db = require('../lib-cov/client')(token);
+var db = require('./creds')();
 var users = require('./testdata')('graph.test');
 var Q = require('kew');
 var util = require('util');

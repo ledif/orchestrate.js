@@ -6,8 +6,7 @@
 
 // Module Dependencies.
 var assert = require('assert');
-var token = require('./creds').token;
-var db = require('../lib-cov/client')(token);
+var db = require('./creds')();
 var users = require('./testdata')('key-value.test');
 var util = require('util');
 
@@ -174,4 +173,23 @@ suite('Key-Value', function () {
         done();
       });
   });
+
+  test('Merge as upsert', function(done) {
+    var key = users.steve.email + '_2';
+
+    db.merge(users.collection, key, {type: "consultant"}, {upsert:true})
+      .then(function (res) {
+        assert.equal(201, res.statusCode);
+        return db.get(users.collection, key);
+      })
+      .then(function (res) {
+        assert.equal(200, res.statusCode);
+        assert.deepEqual({type: "consultant"}, res.body);
+        done();
+      })
+      .fail(function (e) {
+        done(e);
+      });
+  });
+
 });
