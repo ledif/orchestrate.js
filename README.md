@@ -113,7 +113,7 @@ Alternatively, you can apply a series of controlled changes to a key by construc
 db.newPatchBuilder('collection', 'key')
   .add('age', 25)
   .replace('hometown', 'NY')
-  .apply()
+  .build()
   .then(function (result) {
       // All changes were applied successfully
   })
